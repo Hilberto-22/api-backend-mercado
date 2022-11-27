@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.backend.apibackendmercado.model.Produto;
+import br.com.backend.apibackendmercado.model.exception.ResourceNotFoundException;
 import br.com.backend.apibackendmercado.repository.ProdutoRepository;
 
 @Service
@@ -54,7 +55,7 @@ public class ProdutoService {
         Optional<Produto> produto = produtoRepository.findById(id);
 
         if(produto.isEmpty()){
-            throw new RuntimeException("Não foi possível deletar o produto com o id: " + id);
+            throw new ResourceNotFoundException("Não foi possível deletar o produto com o id: " + id);
         }
         produtoRepository.deleteById(id);
     }
