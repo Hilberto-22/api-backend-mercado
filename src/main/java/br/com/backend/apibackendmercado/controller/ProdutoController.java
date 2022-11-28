@@ -40,7 +40,7 @@ public class ProdutoController {
      * @param id
      * @return
      */
-    @GetMapping("/{id}")
+    @GetMapping("/listarPorId/{id}")
     public ResponseEntity<Optional<Produto>> listarPorId(@PathVariable UUID id){
        return new ResponseEntity<>(produtoService.listarPorId(id), HttpStatus.OK);
     } 
@@ -60,10 +60,10 @@ public class ProdutoController {
      * @param id
      * @return
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public String delete(@PathVariable UUID id){
         produtoService.deletarProduto(id);
-        return "Produto com id:" + id + "foi deletado com sucesso";
+        return "Produto com id: " + id + " foi deletado com sucesso";
     }
     
     /**
@@ -72,8 +72,8 @@ public class ProdutoController {
      * @param id
      * @return
      */
-    @PutMapping("/atualizar")
-    public Produto updateProduto(@RequestBody Produto produto, UUID id){
+    @PutMapping("/atualizarProduto/{id}")
+    public Produto updateProduto(@PathVariable(value = "id") UUID id, Produto produto){
         return produtoService.updateProduto(id, produto);
     }
 }
