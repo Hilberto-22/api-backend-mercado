@@ -1,7 +1,6 @@
 package br.com.backend.apibackendmercado.model.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
