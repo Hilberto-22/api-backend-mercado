@@ -3,7 +3,9 @@ package br.com.backend.apibackendmercado.controller;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.backend.apibackendmercado.model.Produto;
+import br.com.backend.apibackendmercado.dto.ProdutoDto;
+import br.com.backend.apibackendmercado.model.ProdutoRequest;
+import br.com.backend.apibackendmercado.model.ProdutoResponse;
 import br.com.backend.apibackendmercado.services.ProdutoService;
 
 @RestController()
@@ -31,8 +35,15 @@ public class ProdutoController {
      * @return
      */
     @GetMapping("/listarTodos")
-    public List<Produto> listarTodos(){
-        return produtoService.listarTodos();
+    public ResponseEntity<List<ProdutoResponse>> listarTodos(){
+        List<ProdutoDto> produtos =  produtoService.listarTodos();
+        ModelMapper mapper = new ModelMapper();
+
+        List<ProdutoResponse> resposta = produtos.stream()
+                .map(produtoDto -> mapper.map(produtoDto, ProdutoResponse.class))
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(resposta, HttpStatus.OK);
     }
 
     /**
@@ -41,8 +52,12 @@ public class ProdutoController {
      * @return
      */
     @GetMapping("/listarPorId/{id}")
-    public ResponseEntity<Optional<Produto>> listarPorId(@PathVariable UUID id){
-       return new ResponseEntity<>(produtoService.listarPorId(id), HttpStatus.OK);
+    public ResponseEntity<Optional<ProdutoResponse>> listarPorId(@PathVariable(value = "id") UUID id){
+        
+        Optional<ProdutoDto> produtoDto = produtoService.listarPorId(id);
+        ProdutoResponse produto = new ModelMapper().map(produtoDto.get(), ProdutoResponse.class);
+
+        return new ResponseEntity<>(Optional.of(produto), HttpStatus.OK);
     } 
 
     /**
@@ -51,8 +66,14 @@ public class ProdutoController {
      * @return
      */
     @PostMapping("/cadastrarProduto")
-    public Produto cadastrarProduto(@RequestBody Produto produto){
-        return produtoService.cadastrarProduto(produto);
+    public ResponseEntity<ProdutoResponse> cadastrarProduto(@RequestBody ProdutoRequest produtoRequest){
+
+        ModelMapper model = new ModelMapper();
+
+        ProdutoDto produtoDto = model.map(produtoRequest, ProdutoDto.class);
+        produtoDto = produtoService.cadastrarProduto(produtoDto);
+
+        return new ResponseEntity<>(model.map(produtoDto, ProdutoResponse.class), HttpStatus.CREATED);
     }
 
     /**
@@ -61,9 +82,9 @@ public class ProdutoController {
      * @return
      */
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable UUID id){
+    public ResponseEntity<?> delete(@PathVariable UUID id){
         produtoService.deletarProduto(id);
-        return "Produto com id: " + id + " foi deletado com sucesso";
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
     /**
@@ -73,8 +94,13 @@ public class ProdutoController {
      * @return
      */
     @PutMapping("/atualizarProduto/{id}")
-    public ResponseEntity<Produto> updateProduto(@PathVariable(value = "id") UUID id, @RequestBody Produto produto){
-        return new ResponseEntity<>(produtoService.updateProduto(id, produto), HttpStatus.OK);
+    public ResponseEntity<ProdutoResponse> updateProduto(@PathVariable(value = "id") UUID id, @RequestBody ProdutoRequest produtoRequest){
+       
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoDto produtodDto = modelMapper.map(produtoRequest, ProdutoDto.class);
+
+        produtodDto = produtoService.updateProduto(id, produtodDto);
+        return new ResponseEntity<>(modelMapper.map(produtodDto, ProdutoResponse.class), HttpStatus.OK);
     }
 }
  
