@@ -22,6 +22,7 @@ import br.com.backend.apibackendmercado.dto.ProdutoDto;
 import br.com.backend.apibackendmercado.model.ProdutoRequest;
 import br.com.backend.apibackendmercado.model.ProdutoResponse;
 import br.com.backend.apibackendmercado.services.ProdutoService;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController()
 @RequestMapping("/api/produtos")
@@ -32,9 +33,10 @@ public class ProdutoController {
 
     /**
      * 
-     * @return
+     * @return lista todos os produtos cadastrados na base de dados
      */
     @GetMapping("/listarTodos")
+    @Operation(summary = "Listar todos os produtos")
     public ResponseEntity<List<ProdutoResponse>> listarTodos(){
         List<ProdutoDto> produtos =  produtoService.listarTodos();
         ModelMapper mapper = new ModelMapper();
@@ -49,10 +51,10 @@ public class ProdutoController {
     /**
      * 
      * @param id
-     * @return
+     * @return retorna a pesquisa do produto pelo id
      */
     @GetMapping("/listarPorId/{id}")
-    public ResponseEntity<Optional<ProdutoResponse>> listarPorId(@PathVariable(value = "id") UUID id){
+    public ResponseEntity<Optional<ProdutoResponse>> listarPorId(@PathVariable UUID id){
         
         Optional<ProdutoDto> produtoDto = produtoService.listarPorId(id);
         ProdutoResponse produto = new ModelMapper().map(produtoDto.get(), ProdutoResponse.class);
@@ -61,9 +63,9 @@ public class ProdutoController {
     } 
 
     /**
-     * 
+     * @author Hilberto Gouveia
      * @param produto
-     * @return
+     * @return cadastra o produto
      */
     @PostMapping("/cadastrarProduto")
     public ResponseEntity<ProdutoResponse> cadastrarProduto(@RequestBody ProdutoRequest produtoRequest){
@@ -79,7 +81,7 @@ public class ProdutoController {
     /**
      * 
      * @param id
-     * @return
+     * @return é passado o id do produto para que seja deletado da base de dados
      */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id){
@@ -94,7 +96,7 @@ public class ProdutoController {
      * @return
      */
     @PutMapping("/atualizarProduto/{id}")
-    public ResponseEntity<ProdutoResponse> updateProduto(@PathVariable(value = "id") UUID id, @RequestBody ProdutoRequest produtoRequest){
+    public ResponseEntity<ProdutoResponse> updateProduto(@PathVariable UUID id, @RequestBody ProdutoRequest produtoRequest){
        
         ModelMapper modelMapper = new ModelMapper();
         ProdutoDto produtodDto = modelMapper.map(produtoRequest, ProdutoDto.class);
