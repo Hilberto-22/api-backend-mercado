@@ -1,5 +1,8 @@
 package br.com.backend.apibackendmercado.model.exception;
 
+import lombok.Data;
+
+@Data
 public class ErrorMessage {
     
     private String titleError;
